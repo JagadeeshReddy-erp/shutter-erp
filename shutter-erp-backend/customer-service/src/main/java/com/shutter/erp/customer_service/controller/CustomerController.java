@@ -37,8 +37,7 @@ public class CustomerController {
 
 	private final CustomerService customerService;
 
-	@PreAuthorize("hasRole('ADMIN')")
-//  @PreAuthorize("hasRole('EMPLOYEE')")
+	@PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
 	@PostMapping("/CreateCustomer")
 	public ResponseEntity<ApiResponse<?>> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
 
