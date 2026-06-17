@@ -1,0 +1,21 @@
+# Java
+target/
+*.log
+*.class
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Environment
+.env
+
+# Node
+node_modules/
+dist/
+build/
