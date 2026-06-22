@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -255,9 +256,150 @@ public class QuotationServiceImpl implements QuotationService {
 	
 	
 	@Override
-	public ApiResponse<QuotationResponseDto> updateQuotation(Long quotationId, CreateQuotationRequestDto requestDto) {
-		// TODO Auto-generated method stub
-		return null;
+	public ApiResponse<PaginationResponse<QuotationResponseDto>> getQuotationsByCustomerId(
+	        Long customerId,
+	        int pageNo,
+	        int pageSize) {
+
+	    Pageable pageable = PageRequest.of(
+	            pageNo,
+	            pageSize,
+	            Sort.by("id").descending());
+
+	    Page<Quotation> quotationPage =
+	            quotationRepository.findByCustomerId(customerId, pageable);
+
+	    List<QuotationResponseDto> quotationResponses =
+	            quotationPage.getContent()
+	                    .stream()
+	                    .map(quotation -> {
+
+	                        QuotationResponseDto dto = new QuotationResponseDto();
+
+	                        dto.setId(quotation.getId());
+	                        dto.setQuotationNo(quotation.getQuotationNo());
+	                        dto.setVersionNo(quotation.getVersionNo());
+	                        dto.setCustomerId(quotation.getCustomerId());
+	                        dto.setTotalAmount(quotation.getTotalAmount());
+	                        dto.setTotalProfit(quotation.getTotalProfit());
+	                        dto.setGstPercentage(quotation.getGstPercentage());
+	                        dto.setGstAmount(quotation.getGstAmount());
+	                        dto.setGrandTotal(quotation.getGrandTotal());
+	                        dto.setStatus(quotation.getStatus());
+
+	                        // IMPORTANT: no shutters
+	                        dto.setShutters(Collections.emptyList());
+
+	                        return dto;
+	                    })
+	                    .toList();
+
+	    PaginationResponse<QuotationResponseDto> pagination =
+	            new PaginationResponse<>(
+	                    quotationResponses,
+	                    quotationPage.getNumber(),
+	                    quotationPage.getSize(),
+	                    quotationPage.getTotalElements(),
+	                    quotationPage.getTotalPages(),
+	                    quotationPage.isLast());
+
+	    return new ApiResponse<>(
+	            true,
+	            "Quotations fetched successfully for customer",
+	            pagination);
+	}
+	
+	@Override
+	@Transactional
+	public ApiResponse<QuotationResponseDto> updateQuotation(
+	        Long quotationId,
+	        CreateQuotationRequestDto requestDto) {
+
+	    // STEP 1: Fetch existing quotation
+	    Quotation oldQuotation = getQuotation(quotationId);
+
+	    // STEP 2: Mark old quotation as expired
+	    oldQuotation.setStatus(QuotationStatus.EXPIRED);
+	    quotationRepository.save(oldQuotation);
+
+	    // STEP 3: Create NEW quotation (versioned copy)
+	    Quotation newQuotation = buildQuotationEntity(
+	            requestDto,
+	            oldQuotation.getQuotationNo());
+
+	    newQuotation.setVersionNo(oldQuotation.getVersionNo() + 1);
+
+	    newQuotation = quotationRepository.save(newQuotation);
+
+	    BigDecimal quotationTotalAmount = BigDecimal.ZERO;
+	    BigDecimal quotationTotalProfit = BigDecimal.ZERO;
+
+	    List<ShutterQuotationResponseDto> shutterResponses = new ArrayList<>();
+
+	    // STEP 4: Rebuild shutters + items
+	    for (ShutterQuotationRequestDto shutterDto : requestDto.getShutters()) {
+
+	        ShutterQuotation shutterQuotation =
+	                buildShutterEntity(newQuotation.getId(), shutterDto);
+
+	        shutterQuotation = shutterQuotationRepository.save(shutterQuotation);
+
+	        BigDecimal shutterAmount = BigDecimal.ZERO;
+	        BigDecimal shutterProfit = BigDecimal.ZERO;
+
+	        List<ItemQuotationResponseDto> itemResponses = new ArrayList<>();
+
+	        for (ItemQuotationRequestDto itemDto : shutterDto.getItems()) {
+
+	            ItemQuotation itemQuotation =
+	                    buildItemEntity(shutterQuotation.getId(), itemDto);
+
+	            calculateItemValues(itemQuotation);
+
+	            itemQuotation = itemQuotationRepository.save(itemQuotation);
+
+	            shutterAmount = shutterAmount.add(itemQuotation.getAmount());
+	            shutterProfit = shutterProfit.add(itemQuotation.getProfit());
+
+	            itemResponses.add(quotationMapper.toItemResponseDto(itemQuotation));
+	        }
+
+	        shutterQuotation.setShutterTotalAmount(shutterAmount);
+	        shutterQuotation.setShutterTotalProfit(shutterProfit);
+
+	        shutterQuotation = shutterQuotationRepository.save(shutterQuotation);
+
+	        quotationTotalAmount = quotationTotalAmount.add(shutterAmount);
+	        quotationTotalProfit = quotationTotalProfit.add(shutterProfit);
+
+	        shutterResponses.add(
+	                quotationMapper.toShutterResponseDto(shutterQuotation, itemResponses));
+	    }
+
+	    // STEP 5: GST calculation
+	    BigDecimal gstAmount = calculationUtil.calculateGstAmount(
+	            quotationTotalAmount,
+	            requestDto.getGstPercentage());
+
+	    BigDecimal grandTotal = calculationUtil.calculateGrandTotal(
+	            quotationTotalAmount,
+	            gstAmount);
+
+	    newQuotation.setTotalAmount(quotationTotalAmount);
+	    newQuotation.setTotalProfit(quotationTotalProfit);
+	    newQuotation.setGstAmount(gstAmount);
+	    newQuotation.setGrandTotal(grandTotal);
+
+	    newQuotation = quotationRepository.save(newQuotation);
+
+	    // STEP 6: Response mapping
+	    QuotationResponseDto responseDto =
+	            quotationMapper.toQuotationResponseDto(newQuotation, shutterResponses);
+
+	    return new ApiResponse<>(
+	            true,
+	            "Quotation updated successfully (new version created)",
+	            responseDto);
 	}
 
 	private ShutterQuotation buildShutterEntity(Long quotationId, ShutterQuotationRequestDto shutterDto) {

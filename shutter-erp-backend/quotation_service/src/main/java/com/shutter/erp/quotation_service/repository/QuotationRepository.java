@@ -13,7 +13,7 @@ import com.shutter.erp.quotation_service.entity.Quotation;
 
 @Repository
 public interface QuotationRepository extends JpaRepository<Quotation, Long> {
-
+	Page<Quotation> findByCustomerId(Long customerId, Pageable pageable);
     Optional<Quotation> findTopByQuotationNoStartingWithOrderByQuotationNoDesc(String prefix);
     Optional<Quotation> findByQuotationNoAndVersionNo( String quotationNo,Integer versionNo);
     List<Quotation> findByQuotationNoOrderByVersionNoDesc(String quotationNo);

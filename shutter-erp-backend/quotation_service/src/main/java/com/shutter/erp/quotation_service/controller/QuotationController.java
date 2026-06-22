@@ -48,6 +48,17 @@ public class QuotationController {
         return ResponseEntity.ok(
                 quotationService.getQuotationById(quotationId));
     }
+    
+    @GetMapping("/customer/{customerId}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<ApiResponse<PaginationResponse<QuotationResponseDto>>> getQuotationsByCustomerId(
+            @PathVariable Long customerId,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        return ResponseEntity.ok(
+                quotationService.getQuotationsByCustomerId(customerId, pageNo, pageSize));
+    }
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")

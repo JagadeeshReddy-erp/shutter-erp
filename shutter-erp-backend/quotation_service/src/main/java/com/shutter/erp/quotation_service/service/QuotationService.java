@@ -23,4 +23,9 @@ public interface QuotationService {
             Long quotationId);
 
 	ApiResponse<PaginationResponse<QuotationResponseDto>> getAllQuotations(int pageNo, int pageSize, LocalDate fromDate,LocalDate toDate);
+	
+	ApiResponse<PaginationResponse<QuotationResponseDto>> getQuotationsByCustomerId(
+	        Long customerId,
+	        int pageNo,
+	        int pageSize);
 }
