@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8"/>
+
+<style>
+
+@page {
+    size: A4;
+    margin: 18mm;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #222;
+}
+
+/* =========================
+   COMPANY HEADER
+   ========================= */
+.company-header {
+    text-align: center;
+    border-bottom: 2px solid #0f4c81;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.logo {
+    height: 60px;
+}
+
+.company-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0f4c81;
+    margin-top: 5px;
+}
+
+.company-address {
+    font-size: 11px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* =========================
+   TITLE
+   ========================= */
+.title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #0f4c81;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   QUOTATION INFO
+   ========================= */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.info-table td {
+    border: 1px solid #dcdcdc;
+    padding: 10px;
+}
+
+.label {
+    font-weight: bold;
+    background-color: #f7f7f7;
+    width: 25%;
+}
+
+/* =========================
+   AMOUNT SUMMARY
+   ========================= */
+.amount-table {
+    width: 50%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+.amount-table td {
+    border: 1px solid #dcdcdc;
+    padding: 10px;
+}
+
+.amount-label {
+    font-weight: bold;
+    background-color: #f7f7f7;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.grand-total {
+    background-color: #0f4c81;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.grand-total td {
+    padding: 12px;
+}
+
+/* =========================
+   SHUTTER SECTION
+   ========================= */
+.shutter-title {
+    background-color: #0f4c81;
+    color: white;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 25px;
+}
+
+.shutter-info {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.shutter-info td {
+    border: 1px solid #dcdcdc;
+    padding: 8px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.items-table th {
+    background-color: #0f4c81;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.items-table td {
+    border: 1px solid #dcdcdc;
+    padding: 8px;
+}
+
+.total-row {
+    background-color: #f4f7fb;
+    font-weight: bold;
+}
+
+/* =========================
+   TERMS
+   ========================= */
+.note-box {
+    margin-top: 25px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    background-color: #fafafa;
+    font-size: 12px;
+}
+
+.note-box ul {
+    margin-top: 8px;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+.footer {
+    position: fixed;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: #666;
+}
+
+/* =========================
+   PAGE BREAK
+   ========================= */
+.page-break {
+    page-break-before: always;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<div class="company-header">
+
+    <img src="classpath:/static/images/logo.png"
+         class="logo"/>
+
+    <div class="company-name">
+        REDDY SHUTTER ERP SYSTEMS PVT LTD
+    </div>
+
+    <div class="company-address">
+        Housing Board Colony, Mahabubnagar - 509001, Telangana, India
+        <br/>
+        GSTIN: 37ABCDE1234F1Z5 |
+        Phone: +91 1234567890
+    </div>
+
+</div>
+
+<div class="title">
+    QUOTATION
+</div>
+
+<!-- BASIC INFO -->
+
+<table class="info-table">
+
+    <tr>
+        <td class="label">Quotation ID</td>
+        <td th:text="${quotation.id}"></td>
+
+        <td class="label">Customer ID</td>
+        <td th:text="${quotation.customerId}"></td>
+    </tr>
+
+    <tr>
+        <td class="label">Quotation No</td>
+        <td th:text="${quotation.quotationNo}"></td>
+
+        <td class="label">Version No</td>
+        <td th:text="${quotation.versionNo}"></td>
+    </tr>
+
+    <tr>
+        <td class="label">Status</td>
+        <td th:text="${quotation.status}"></td>
+
+	<td class="label">Generated On</td>
+    <td th:text="${#temporals.format(generatedDateTime,'dd-MM-yyyy HH:mm:ss')}"></td>
+    </tr>
+
+</table>
+
+<!-- TOTALS -->
+
+<table class="amount-table">
+
+    <tr>
+        <td class="amount-label">Total Amount</td>
+        <td class="text-right"
+            th:text="${quotation.totalAmount}">
+        </td>
+    </tr>
+
+    <tr>
+        <td class="amount-label">GST Percentage</td>
+        <td class="text-right"
+            th:text="${quotation.gstPercentage + ' %'}">
+        </td>
+    </tr>
+
+    <tr>
+        <td class="amount-label">GST Amount</td>
+        <td class="text-right"
+            th:text="${quotation.gstAmount}">
+        </td>
+    </tr>
+
+    <tr class="grand-total">
+        <td>GRAND TOTAL</td>
+        <td class="text-right"
+            th:text="${quotation.grandTotal}">
+        </td>
+    </tr>
+
+</table>
+
+<!-- SHUTTERS -->
+
+<div th:each="shutter,iterStat : ${quotation.shutters}">
+
+    <div th:if="${iterStat.index > 0}"
+         class="page-break">
+    </div>
+
+    <div class="shutter-title">
+        SHUTTER NO :
+        <span th:text="${shutter.shutterNo}"></span>
+    </div>
+
+    <table class="shutter-info">
+
+        <tr>
+            <td class="label">Height</td>
+            <td th:text="${shutter.height}"></td>
+        
+            <td class="label">Width</td>
+            <td th:text="${shutter.width}"></td>
+
+
+        </tr>
+
+    </table>
+
+    <table class="items-table">
+
+        <tr>
+            <th>Item Name</th>
+            <th>Item Type</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Amount</th>
+        </tr>
+
+        <tr th:each="item : ${shutter.items}">
+
+            <td th:text="${item.itemNameSnapshot}"></td>
+
+            <td th:text="${item.itemTypeSnapshot}"></td>
+
+            <td th:text="${item.quantity}"></td>
+
+            <td th:text="${item.customerPrice}"></td>
+
+            <td th:text="${item.amount}"></td>
+
+        </tr>
+
+        <tr class="total-row">
+
+            <td colspan="4"
+                style="text-align:right;">
+                SHUTTER TOTAL
+            </td>
+
+            <td th:text="${shutter.shutterTotalAmount}">
+            </td>
+
+        </tr>
+
+    </table>
+
+</div>
+
+<!-- TERMS & CONDITIONS -->
+
+<div class="note-box">
+
+    <b>Terms and Conditions</b>
+
+    <ul>
+        <li>Quotation validity: 30 Days.</li>
+        <li>Taxes applicable as per government regulations.</li>
+        <li>Delivery schedule will be shared after order confirmation.</li>
+        <li>Prices are subject to material availability.</li>
+    </ul>
+
+</div>
+
+<!-- FOOTER -->
+
+<div class="footer">
+    Generated by Reddy ERP System
+</div>
+
+</body>
+</html>
