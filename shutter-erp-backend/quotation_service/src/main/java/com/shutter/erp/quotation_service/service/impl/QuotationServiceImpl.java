@@ -318,6 +318,16 @@ public class QuotationServiceImpl implements QuotationService {
 	    // STEP 1: Fetch existing quotation
 	    Quotation oldQuotation = getQuotation(quotationId);
 
+
+	    // Validation: Expired quotations cannot be updated
+	    if (QuotationStatus.EXPIRED.equals(oldQuotation.getStatus())) {
+	    	 return new ApiResponse<>(
+	    	            false,
+	    	            "Expired quotations cannot be updated.",
+	    	            null
+	    	    );
+	    }
+	    
 	    // STEP 2: Mark old quotation as expired
 	    oldQuotation.setStatus(QuotationStatus.EXPIRED);
 	    quotationRepository.save(oldQuotation);
