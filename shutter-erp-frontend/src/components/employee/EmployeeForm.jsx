@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 const EmployeeForm = ({
   initialData = {},
   onSubmit,
-  onBack,        // ✅ added
+  onBack,
   loading,
   isEdit = false,
 }) => {
@@ -13,6 +13,7 @@ const EmployeeForm = ({
     email: "",
     password: "",
     role: "EMPLOYEE",
+    active: true, // ✅ NEW FIELD
   });
 
   useEffect(() => {
@@ -22,13 +23,19 @@ const EmployeeForm = ({
         email: initialData.email || "",
         password: "",
         role: initialData.role || "EMPLOYEE",
+        active: initialData.active ?? true, // ✅ map from API
       });
     }
   }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      // convert active dropdown string → boolean
+      [name]: name === "active" ? value === "true" : value,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -36,6 +43,7 @@ const EmployeeForm = ({
 
     const payload = { ...form };
 
+    // remove password if not entered in edit mode
     if (isEdit && !payload.password) {
       delete payload.password;
     }
@@ -45,22 +53,17 @@ const EmployeeForm = ({
 
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
-
       <div style={styles.header}>
         <h3 style={styles.title}>
           {isEdit ? "Edit Employee" : "Create Employee"}
         </h3>
 
-        {/* ✅ BACK BUTTON */}
-        <button
-          type="button"
-          onClick={onBack}
-          style={styles.backBtn}
-        >
+        <button type="button" onClick={onBack} style={styles.backBtn}>
           ← Back
         </button>
       </div>
 
+      {/* Username */}
       <div style={styles.field}>
         <label style={styles.label}>Username</label>
         <input
@@ -72,6 +75,7 @@ const EmployeeForm = ({
         />
       </div>
 
+      {/* Email */}
       <div style={styles.field}>
         <label style={styles.label}>Email</label>
         <input
@@ -84,6 +88,7 @@ const EmployeeForm = ({
         />
       </div>
 
+      {/* Password */}
       <div style={styles.field}>
         <label style={styles.label}>
           Password {isEdit && "(leave blank to keep unchanged)"}
@@ -98,6 +103,7 @@ const EmployeeForm = ({
         />
       </div>
 
+      {/* Role */}
       <div style={styles.field}>
         <label style={styles.label}>Role</label>
         <select
@@ -110,6 +116,22 @@ const EmployeeForm = ({
           <option value="EMPLOYEE">EMPLOYEE</option>
         </select>
       </div>
+
+      {/* ✅ ACTIVE DROPDOWN (ONLY FOR EDIT) */}
+      {isEdit && (
+        <div style={styles.field}>
+          <label style={styles.label}>Status</label>
+          <select
+            name="active"
+            value={form.active ? "true" : "false"}
+            onChange={handleChange}
+            style={styles.select}
+          >
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+      )}
 
       <button type="submit" disabled={loading} style={styles.submitBtn}>
         {isEdit ? "Update User" : "Create User"}

@@ -11,9 +11,11 @@ const EmployeeTable = ({ users, onEdit }) => {
             <th style={styles.th}>Username</th>
             <th style={styles.th}>Email</th>
             <th style={styles.th}>Role</th>
+            <th style={styles.th}>Active</th> {/* NEW COLUMN */}
             <th style={styles.th}>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {users && users.length > 0 ? (
             users.map((user) => (
@@ -22,6 +24,26 @@ const EmployeeTable = ({ users, onEdit }) => {
                 <td style={styles.td}>{user.username}</td>
                 <td style={styles.td}>{user.email}</td>
                 <td style={styles.td}>{user.role}</td>
+
+                {/* ACTIVE STATUS */}
+                <td style={styles.td}>
+                  <span
+                    style={{
+                      padding: "5px 10px",
+                      borderRadius: "12px",
+                      fontWeight: 600,
+                      color: "#fff",
+                      backgroundColor: user.active ? "#28a745" : "#dc3545",
+                      display: "inline-block",
+                      minWidth: "70px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {user.active ? "Active" : "Inactive"}
+                  </span>
+                </td>
+
                 <td style={styles.td}>
                   <button
                     style={styles.editBtn}
@@ -34,7 +56,7 @@ const EmployeeTable = ({ users, onEdit }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" style={styles.noData}>
+              <td colSpan="6" style={styles.noData}>
                 No users found.
               </td>
             </tr>
@@ -59,7 +81,7 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "600px",
+    minWidth: "700px",
   },
   thead: {
     backgroundColor: "#c0c4ff",
