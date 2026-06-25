@@ -37,6 +37,12 @@ import ItemEdit from "./pages/inventory/item/ItemEdit";
 import StockCreate from "./pages/inventory/stock/StockCreate";
 import StockManage from "./pages/inventory/stock/StockManage";
 
+// LOAD FACTORS
+import LoadFactorListPage from "./pages/inventory/loadFactor/LoadFactorListPage";
+import CreateLoadFactorPage from "./pages/inventory/loadFactor/CreateLoadFactorPage";
+import EditLoadFactorPage from "./pages/inventory/loadFactor/EditLoadFactorPage";
+
+
 function App() {
   const { user } = useContext(AuthContext);
 
@@ -97,6 +103,10 @@ function App() {
       <Route path="/inventory/stock/create" element={<StockCreate />} />
       <Route path="/inventory/stock/manage" element={<StockManage />} />
 
+       {/* LOAD FACTORS */}
+      <Route path="/inventory/load-factor/manage"element={<LoadFactorListPage />}/>
+      <Route path="/inventory/load-factor/create" element={<CreateLoadFactorPage />}/>
+      <Route path="/inventory/load-factor/edit/:id" element={<EditLoadFactorPage />}/>
         </Route>
 
         {/* FALLBACK */}
