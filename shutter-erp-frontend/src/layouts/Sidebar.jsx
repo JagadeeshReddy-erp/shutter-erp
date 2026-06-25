@@ -8,7 +8,7 @@ const menuItems = [
 
   { name: "Customer Management", mode: "CUSTOMER", workspace: true, roles: ["ADMIN", "EMPLOYEE"] },
   { name: "Quotation System", mode: "QUOTATION", workspace: true, roles: ["ADMIN", "EMPLOYEE"] },
-  { name: "Order Tracking", mode: "ORDER", workspace: true, roles: ["ADMIN", "EMPLOYEE"] },
+  { name: "Order System", mode: "ORDER", workspace: true, roles: ["ADMIN", "EMPLOYEE"] },
 
   { name: "Material Inventory", path: "/inventory", roles: ["ADMIN"] },
   { name: "Employee Management", path: "/employees", roles: ["ADMIN"] },

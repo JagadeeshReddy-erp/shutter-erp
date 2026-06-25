@@ -1,3 +1,4 @@
+//src/pages/inventory/MaterialInventoryPage.jsx
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -70,6 +71,20 @@ const [hoveredCard, setHoveredCard] = useState(null);
                 >
                   Manage Items
                 </div>
+<div
+                  style={styles.menuItem}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background =
+                      "linear-gradient(90deg, #ffacac, #808fff)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "transparent")
+                  }
+                  onClick={() => goTo("/inventory/load-factor/manage")}
+                >
+                  Manage load factors
+                </div>
+
               </div>
             )}
           </div>
@@ -269,7 +284,7 @@ infoGrid: {
   gridTemplateColumns: "repeat(2, minmax(280px, 420px))",
   justifyContent: "center",   // 🔥 centers the whole grid
   gap: "20px",
- marginTop: "80px",
+ marginTop: "102px",
   padding: "10px",
 },
 
@@ -280,7 +295,7 @@ infoGrid: {
     padding: "18px",
 
     borderRadius: "14px",
-    background: "rgb(255, 200, 200)",
+    background: "rgb(255, 218, 218)",
     backdropFilter: "blur(14px)",
 marginBottom: "16px",
     border: "1px solid rgb(2, 23, 254)",
