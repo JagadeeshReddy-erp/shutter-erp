@@ -47,7 +47,10 @@ public class AuthService {
 
 public LoginResponse login(LoginRequest request) {
 
-	User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Invalid Email"));
+    User user = userRepository
+            .findByEmailAndActiveTrue(request.getEmail())
+            .orElseThrow(() -> new RuntimeException("Invalid Email or inactive user"));
+    
 	boolean isPasswordMatch = passwordEncoder.matches(request.getPassword(), user.getPassword());
     if (!isPasswordMatch) {
         throw new RuntimeException("Invalid Password");
@@ -66,6 +69,7 @@ public LoginResponse login(LoginRequest request) {
                                 .username(user.getUsername())
                                 .email(user.getEmail())
                                 .role(user.getRole().name())
+                                .active(user.isActive())
                                 .build()
                 ))
                 .orElseGet(() -> new ApiResponse<UserProfileResponse>(
@@ -83,12 +87,14 @@ public LoginResponse login(LoginRequest request) {
                         .username(user.getUsername())
                         .email(user.getEmail())
                         .role(user.getRole().name())
+                        .active(user.isActive())
                         .build())
                 .collect(Collectors.toList());
 
         return new ApiResponse<>(true, "All users fetched successfully", users);
     }
 
+    
     public ApiResponse<User> updateUser(Long userId, UpdateUserRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
@@ -100,6 +106,7 @@ public LoginResponse login(LoginRequest request) {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setRole(request.getRole());
+        user.setActive(request.getActive());
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -109,6 +116,7 @@ public LoginResponse login(LoginRequest request) {
         return new ApiResponse<>(true, "User updated successfully", updatedUser);
     }
 
+    
     public ApiResponse<UserProfileResponse> getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -118,6 +126,7 @@ public LoginResponse login(LoginRequest request) {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .active(user.isActive())
                 .build();
 
         return new ApiResponse<>(true, "Profile fetched successfully", profile);

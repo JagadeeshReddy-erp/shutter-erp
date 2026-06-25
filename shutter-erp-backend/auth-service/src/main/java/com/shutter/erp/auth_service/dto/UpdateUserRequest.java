@@ -20,4 +20,7 @@ public class UpdateUserRequest {
 
     @NotNull(message = "Role is required")
     private Role role;
+    
+    @NotNull(message = "Active status is required")
+    private Boolean active;
 }

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.shutter.erp.auth_service.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-
+	Optional<User> findByEmailAndActiveTrue(String email);
     Optional<User> findByEmail(String email);
     Optional<User> findById(Long id);
     boolean existsByEmail(String email);
