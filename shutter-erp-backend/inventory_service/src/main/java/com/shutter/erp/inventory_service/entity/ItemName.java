@@ -2,14 +2,14 @@ package com.shutter.erp.inventory_service.entity;
 
 public enum ItemName {
 	 	PATTI,
-	    MOTOR,
 	    SPRING,
-	    LOCK,
-	    GUIDE,
 	    BEARING,
 	    SHAFT,
 	    PLATE,
+	    GUIDE,
+	    BOTTOM,
+	    LOCK,
+	    MOTOR,
 	    GEAR ,
 	    NUTS_BOLTS,
-	    BOTTOM
 }

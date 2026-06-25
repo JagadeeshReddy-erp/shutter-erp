@@ -28,6 +28,8 @@ public class ItemMasterResponseDto {
 
     private BigDecimal sellingPrice;
     
+    private BigDecimal loadFactor;
+    
     private boolean isActive;
 
     private LocalDateTime createdAt;

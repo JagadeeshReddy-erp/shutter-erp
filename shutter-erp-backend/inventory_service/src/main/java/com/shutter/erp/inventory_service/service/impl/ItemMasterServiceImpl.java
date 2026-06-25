@@ -2,6 +2,8 @@ package com.shutter.erp.inventory_service.service.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import com.shutter.erp.inventory_service.dto.ItemMasterRequestDto;
 import com.shutter.erp.inventory_service.dto.ItemMasterResponseDto;
 import com.shutter.erp.inventory_service.entity.ItemMaster;
 import com.shutter.erp.inventory_service.repository.ItemMasterRepository;
+import com.shutter.erp.inventory_service.repository.LoadFactorRepository;
 import com.shutter.erp.inventory_service.service.ItemMasterService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class ItemMasterServiceImpl implements ItemMasterService {
 
     private final ItemMasterRepository itemMasterRepository;
-
+    private final LoadFactorRepository loadFactorRepository;
+    
     @Override
     public ApiResponse<ItemMasterResponseDto> createItem(
             ItemMasterRequestDto request) {
@@ -68,9 +72,38 @@ public class ItemMasterServiceImpl implements ItemMasterService {
     @Override
     public ApiResponse<List<ItemMasterResponseDto>> getAllActiveItems() {
 
+        // 1. Load all load factors in one DB call
+        Map<Long, BigDecimal> loadFactorMap = loadFactorRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        lf -> lf.getItemId(),
+                        lf -> lf.getLoadFactor()
+                ));
+
+        // 2. Build response
         List<ItemMasterResponseDto> items = itemMasterRepository.findByIsActiveTrue()
                 .stream()
-                .map(this::mapToResponse)
+                .map(item -> {
+
+                    BigDecimal loadFactor = loadFactorMap.getOrDefault(
+                            item.getId(),
+                            BigDecimal.ZERO
+                    );
+
+                    return ItemMasterResponseDto.builder()
+                            .id(item.getId())
+                            .itemName(item.getItemName())
+                            .itemType(item.getItemType())
+                            .currentQuantity(item.getCurrentQuantity())
+                            .sellingPrice(item.getSellingPrice())
+                            .loadFactor(loadFactor)   // ✅ injected value
+                            .isActive(item.getIsActive())
+                            .createdAt(item.getCreatedAt())
+                            .createdBy(item.getCreatedBy())
+                            .updatedAt(item.getUpdatedAt())
+                            .updatedBy(item.getUpdatedBy())
+                            .build();
+                })
                 .toList();
 
         return ApiResponse.<List<ItemMasterResponseDto>>builder()
