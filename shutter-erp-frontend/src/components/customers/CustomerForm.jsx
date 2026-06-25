@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CUSTOMER_TYPES } from "../../constants/customerConstants";
 import AlertModal from "../common/AlertModal";
 
@@ -8,6 +9,8 @@ const CustomerForm = ({
   onSubmit,
   onDelete,
 }) => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState(initialValues);
   const [alert, setAlert] = useState("");
   const [errors, setErrors] = useState({});
@@ -32,7 +35,6 @@ const CustomerForm = ({
     }));
   };
 
-  // Allow only numbers + max 10 digits
   const handleNumberInput = (e) => {
     const { name, value } = e.target;
 
@@ -50,7 +52,6 @@ const CustomerForm = ({
   };
 
   const showAlert = (message) => {
-    // 🔥 Important fix: force re-render even if same message repeats
     setAlert("");
     setTimeout(() => {
       setAlert(message);
@@ -98,8 +99,18 @@ const CustomerForm = ({
         </h2>
 
         <div style={styles.headerActions}>
+         
+
           <button type="submit" form="customerForm" style={styles.saveBtn}>
             {mode === "edit" ? "Update" : "Save"}
+          </button>
+
+           <button
+            type="button"
+            style={styles.backBtn}
+            onClick={() => navigate(-1)}
+          >
+            ⬅ Back
           </button>
 
           {mode === "edit" && (
@@ -112,7 +123,6 @@ const CustomerForm = ({
 
       {/* FORM */}
       <form id="customerForm" onSubmit={handleSubmit} style={styles.form}>
-        {/* CUSTOMER NAME */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Customer Name *</label>
           <input
@@ -123,7 +133,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* MOBILE */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Mobile Number *</label>
           <input
@@ -136,9 +145,6 @@ const CustomerForm = ({
           />
         </div>
 
-     
-
-        {/* ADDRESS */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>LandMark Address</label>
           <input
@@ -149,7 +155,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* CITY */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>City</label>
           <input
@@ -160,7 +165,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* PINCODE */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Pincode</label>
           <input
@@ -171,7 +175,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* STATE */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>State</label>
           <input
@@ -182,8 +185,6 @@ const CustomerForm = ({
           />
         </div>
 
-
-           {/* CUSTOMER TYPE */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Customer Type *</label>
           <select
@@ -201,7 +202,6 @@ const CustomerForm = ({
           </select>
         </div>
 
-        {/* CONTACT PERSON */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Contact Person</label>
           <input
@@ -212,8 +212,6 @@ const CustomerForm = ({
           />
         </div>
 
-
-        {/* ALTERNATE MOBILE */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Alternate Mobile</label>
           <input
@@ -226,7 +224,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* EMAIL */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Email</label>
           <input
@@ -237,9 +234,6 @@ const CustomerForm = ({
           />
         </div>
 
-       
-
-        {/* GST */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>GST Number</label>
           <input
@@ -250,7 +244,6 @@ const CustomerForm = ({
           />
         </div>
 
-        {/* REMARKS */}
         <div style={styles.fieldBox}>
           <label style={styles.label}>Remarks</label>
           <textarea
@@ -262,7 +255,6 @@ const CustomerForm = ({
         </div>
       </form>
 
-      {/* ALERT MODAL */}
       <AlertModal message={alert} onClose={() => setAlert("")} />
     </div>
   );
@@ -270,7 +262,7 @@ const CustomerForm = ({
 
 export default CustomerForm;
 
-// STYLES
+/* STYLES */
 const styles = {
   container: {
     padding: "28px",
@@ -278,26 +270,31 @@ const styles = {
     margin: "0 auto",
     fontFamily: "Segoe UI, sans-serif",
   },
+
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "18px",
   },
+
   headerActions: {
     display: "flex",
     gap: "10px",
   },
+
   title: {
     fontSize: "20px",
     fontWeight: "700",
     color: "#1f2a44",
   },
+
   form: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
     gap: "14px",
   },
+
   fieldBox: {
     display: "flex",
     flexDirection: "column",
@@ -306,11 +303,13 @@ const styles = {
     background: "#ffeeee",
     border: "1px solid #0071fa",
   },
+
   label: {
     fontSize: "12px",
     fontWeight: "600",
     marginBottom: "6px",
   },
+
   input: {
     padding: "10px 12px",
     borderRadius: "8px",
@@ -318,6 +317,7 @@ const styles = {
     fontSize: "14px",
     outline: "none",
   },
+
   saveBtn: {
     padding: "10px 18px",
     background: "#2563eb",
@@ -327,9 +327,20 @@ const styles = {
     fontWeight: "600",
     cursor: "pointer",
   },
+
   deleteBtn: {
     padding: "10px 18px",
     background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+
+  backBtn: {
+ padding: "10px 18px",
+    background: "#eb2525",
     color: "#fff",
     border: "none",
     borderRadius: "10px",
